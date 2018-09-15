@@ -1,0 +1,16 @@
+{
+  "name": "ticketengine",
+  "version": "1.0.0",
+  "description": "",
+  "main": "",
+  "dependencies": {
+    "documentdb": "^1.14.2",
+    "request": "^2.85.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

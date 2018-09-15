@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Book My Show</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/heroic-features.css" rel="stylesheet">
+    <script src="config.js"></script>
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="./index.html">Book My Show</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive"
+                aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item ">
+                        <a class="nav-link" href="./index.html">Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./addmovie.html">Add Movie
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+        <header class="jumbotron my-4">
+            <div class="row">
+                <div class="col">
+                    <h1 class="display-3 " id="movie-title"></h1>
+                    <p class="lead" id="release-date"></p>
+                </div>
+                <div class="col-4">
+                    <img src="http://placehold.it/200&text=LoadingImage" id="movieImage" class="img-fluid img-thumbnail" />
+                </div>
+            </div>
+
+        </header>
+
+        <div class="row movieForm">
+            <form id="bookTicket-form" action="#">
+                <div class="form-group">
+                    <input type="hidden" class="form-control" id="movieId" name="movieId" required>
+                    <input type="hidden" class="form-control" id="movieName" name="movieName" required>
+                </div>
+                <div class="form-group">
+                    <label for="customerName">Name</label>
+                    <input type="text" class="form-control" id="customerName" name="customerName" required>
+                </div>
+                <div class="form-group">
+                        <label for="customerEmailAddress">Email</label>
+                        <input type="email" class="form-control" id="customerEmailAddress" name="customerEmailAddress" required>
+                    </div>
+                <div class="form-group">
+                    <label for="noOfTicketsToBook">Number of Tickets</label>
+                    <input type="number" class="form-control" id="noOfTicketsToBook" name="noOfTicketsToBook" required>
+                </div>
+            </form>
+            <button id="bookTicketButton" class="btn btn-default">Book Ticket</button>
+
+        </div>
+
+    </div>
+    <!-- /.container -->
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark fixed-bottom">
+        <div class="container">
+            <p class="m-0 text-center text-white">Copyright &copy; AspNetCommunity 2018</p>
+        </div>
+        <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <script type="text/javascript">
+
+        var getUrlParameter = function(sParam) {
+            var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+                sURLVariables = sPageURL.split('&'),
+                sParameterName,
+                i;
+
+            for (i = 0; i < sURLVariables.length; i++) {
+                sParameterName = sURLVariables[i].split('=');
+
+                if (sParameterName[0] === sParam) {
+                    return sParameterName[1] === undefined ? true : sParameterName[1];
+                }
+            }
+        };
+        var movieId = getUrlParameter('movieId');
+        $(document).ready( () => {
+            $('input[name="movieId"]').val(movieId);
+            $.ajax({
+                type: 'GET',
+                url: appConfig.MovieEngine + '/api/GetMovie?movieId=' + movieId,
+                crossDomain: true,
+                success: (response) => {
+                    $('input[name="movieName"]').val(response.movieName);
+                    $("#movie-title").text(response.movieName);
+                    $("#release-date").text('Release Date: ' + response.movieReleaseDate);
+                    $("#movieImage").attr("src", response.movieImageUrl);
+
+                },
+                error: (request, status, error) => {
+
+                    alert(error);
+                }
+            });
+
+            $('#bookTicketButton').click(()=> {
+                console.log($("#bookTicket-form").serialize());
+                $.ajax({
+                    url: appConfig.TicketEngine + '/api/BookTicket',
+                    type: "POST",
+                    data: JSON.stringify(getFormData($("#bookTicket-form"))),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        alert("Success !");
+                        $("#bookTicket-form").trigger('reset');
+                    }
+                })
+            });
+        });
+
+        var getFormData = function($form) {
+            var unindexed_array = $form.serializeArray();
+            var indexed_array = {};
+
+            $.map(unindexed_array, function (n, i) {
+                indexed_array[n['name']] = n['value'];
+            });
+
+            return indexed_array;
+        }
+
+    </script>
+</body>
+
+</html>
